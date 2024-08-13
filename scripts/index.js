@@ -13,13 +13,14 @@ function createCard(card, deleteCard) {
   const deleteButton = cardElem.querySelector(".card__delete-button");
 
   cardElem.querySelector(".card__title").textContent = card.name;
+  cardElem.querySelector(".card__image").alt = card.name;
   cardElem.querySelector(".card__image").src = card.link;
 
   deleteButton.addEventListener("click", function () {
     deleteCard(cardElem);
   });
 
-  cardList.append(cardElem);
+  return cardElem;
 }
 
 // @todo: Функция удаления карточки
@@ -32,5 +33,6 @@ function deleteCard(card) {
 // @todo: Вывести карточки на страницу
 
 initialCards.forEach(function (card) {
-  createCard(card, deleteCard);
+  const cardElem = createCard(card, deleteCard);
+  cardList.append(cardElem);
 });
