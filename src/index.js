@@ -1,9 +1,21 @@
 import "./pages/index.css";
 import { initialCards } from "./components/cards";
-import { createCard, deleteCard, likeCard, openCardPopup } from "./components/card";
-import { openModal, closeModal } from "./components/modal";
+import { createCard, deleteCard, likeCard } from "./components/card";
+import { openModal, closeModal, closeOnOverlay, closeOnEsc } from "./components/modal";
 
 const cardList = document.querySelector(".places__list");
+const img = document.querySelector(".popup__image");
+const imgPopupText = document.querySelector(".popup__caption");
+
+const popupImg = document.querySelector(".popup_type_image");
+const popupCard = document.querySelector(".popup_type_new-card");
+const popupProfile = document.querySelector(".popup_type_edit");
+
+const btnImgClose = popupImg.querySelector(".popup__close");
+const nameProfile = document.querySelector('.profile__title');
+const jobProfile = document.querySelector('.profile__description');
+
+btnImgClose.addEventListener("click", closeCardPopup);
 
 //добавление карточек из массива
 initialCards.forEach(function (card) {
@@ -16,49 +28,32 @@ function createEditPopupListeners() {
   const popupProfile = document.querySelector(".popup_type_edit");
   const btnEditOpen = document.querySelector(".profile__edit-button");
   const btnEditClose = popupProfile.querySelector(".popup__close");
-  const formElement = document.forms["edit-profile"];
-  const nameInput = formElement.elements.name;
-  const jobInput = formElement.elements.description;
+  const formEditProfile = document.forms["edit-profile"];
+  const nameInput = formEditProfile.elements.name;
+  const jobInput = formEditProfile.elements.description;
+  popupProfile.classList.add("popup_is-animated");
 
   function openEditPopup() {
-    
     openModal(popupProfile, "popup_is-opened");
-    
-    btnEditClose.addEventListener("click", closeEditPopup);
-    popupProfile.addEventListener("click", closeOnOverlay);
-    window.addEventListener("keydown", closeOnEsc);
 
-    nameInput.value = document.querySelector('.profile__title').textContent;
-    jobInput.value = document.querySelector('.profile__description').textContent;
-    formElement.addEventListener('submit', handleFormSubmit);
+    btnEditClose.addEventListener("click", closeEditPopup);
+
+    nameInput.value = nameProfile.textContent;
+    jobInput.value = jobProfile.textContent;
   }
   function closeEditPopup() {
     btnEditClose.removeEventListener("click", closeEditPopup);
-    popupProfile.removeEventListener("click", closeOnOverlay);
-    window.removeEventListener("keydown", closeOnEsc);
     closeModal(popupProfile, "popup_is-opened");
   }
 
-  function handleFormSubmit(evt) {
-    evt.preventDefault();
-    document.querySelector('.profile__title').textContent = nameInput.value;
-    document.querySelector('.profile__description').textContent = jobInput.value;
+  function submitEditProfileForm(event) {
+    event.preventDefault();
+    nameProfile.textContent = nameInput.value;
+    jobProfile.textContent = jobInput.value;
     closeModal(popupProfile, "popup_is-opened");
   }
-  openModal(popupProfile, "popup_is-animated");
   btnEditOpen.addEventListener("click", openEditPopup);
-
-  function closeOnOverlay(event) {
-    if (event.target.classList.contains("popup")) {
-      closeEditPopup();
-    }
-  }
-
-  function closeOnEsc(event) {
-    if (popupProfile.classList.contains("popup_is-opened") && event.key === "Escape"){
-      closeEditPopup();
-    }
-  }
+  formEditProfile.addEventListener('submit', submitEditProfileForm);
 }
 
 //открытие и закрытие окна добавления карточек
@@ -69,15 +64,14 @@ function createCardPopupListeners() {
   const formCreateCard = document.forms["new-place"];
   const nameInput = formCreateCard.elements["place-name"];
   const linkInput = formCreateCard.elements.link;
+  popupCard.classList.add("popup_is-animated");
   
 
   function openCreateCardPopup() {
     openModal(popupCard, "popup_is-opened");
     btnCardClose.addEventListener("click", closeCardPopup);
-    popupCard.addEventListener("click", closeOnOverlay);
-    window.addEventListener("keydown", closeOnEsc);
     
-    formCreateCard.addEventListener('submit', handleFormSubmit);
+    
   }
   function closeCardPopup() {
     btnCardClose.removeEventListener("click", closeCardPopup);
@@ -86,8 +80,8 @@ function createCardPopupListeners() {
     closeModal(popupCard, "popup_is-opened");
   }
 
-  function handleFormSubmit(evt) {
-    evt.preventDefault();
+  function submitAddCardForm(event) {
+    event.preventDefault();
 
     const newCard = {
       name: nameInput.value,
@@ -96,22 +90,27 @@ function createCardPopupListeners() {
 
     const cardElem = createCard(newCard, deleteCard, likeCard, openCardPopup);
     cardList.prepend(cardElem);
-
+    formCreateCard.reset();
     closeModal(popupCard, "popup_is-opened");
   }
-  openModal(popupCard, "popup_is-animated");
   btnCardAdd.addEventListener("click", openCreateCardPopup);
+  formCreateCard.addEventListener('submit', submitAddCardForm);
+}
 
-  function closeOnOverlay(event) {
-    if (event.target.classList.contains("popup")) {
-      closeCardPopup();
-    }
-  }
-  function closeOnEsc(event) {
-    if (popupCard.classList.contains("popup_is-opened") && event.key === "Escape"){
-      closeCardPopup();
-    }
-  }
+function openCardPopup(card) {
+  openModalImg(popupImg, "popup_is-opened", card.link, card.name, card.name);
+}
+function closeCardPopup() {
+  btnImgClose.removeEventListener("click", closeCardPopup);
+  closeModal(popupImg, "popup_is-opened");
+}
+
+function openModalImg(elem, className, imgLink, imgName, textName) {
+  openModal(elem, className);
+  
+  img.src = imgLink;
+  img.alt = imgName;
+  imgPopupText.textContent = textName;
 }
 
 createEditPopupListeners();
