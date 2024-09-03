@@ -1,7 +1,11 @@
-const cardTemplate = document.querySelector("#card-template").content;
+function getCardTemplate() {
+  const cardTemplate = document.querySelector("#card-template").content;
+  const cardElem = cardTemplate.querySelector(".card").cloneNode(true);
+  return cardElem;
+}
 
 function createCard(card, deleteCard, likeCard, openCardPopup) {
-  const cardElem = cardTemplate.querySelector(".card").cloneNode(true);
+  const cardElem = getCardTemplate();
   const deleteButton = cardElem.querySelector(".card__delete-button");
   const likeButton = cardElem.querySelector(".card__like-button");
   const cardImg = cardElem.querySelector(".card__image");
