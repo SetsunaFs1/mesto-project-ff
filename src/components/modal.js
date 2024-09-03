@@ -1,29 +1,26 @@
-function openModal(elem, className) {
-  elem.classList.add(className);
-  elem.addEventListener("click", (event) =>
-    closeOnOverlay(event, elem, className)
-  );
-  window.addEventListener("keydown", (event) =>
-    closeOnEsc(event, elem, className)
-  );
+function openModal(elem) {
+  elem.classList.add("popup_is-opened");
+  elem.addEventListener("click", closeOnOverlay);
+  window.addEventListener("keydown", closeOnEsc);
 }
 
-function closeModal(elem, className) {
+function closeModal(elem) {
   elem.removeEventListener("click", closeOnOverlay);
   window.removeEventListener("keydown", closeOnEsc);
-  elem.classList.remove(className);
+  elem.classList.remove("popup_is-opened");
 }
 
-function closeOnOverlay(event, elem, className) {
+function closeOnOverlay(event) {
   if (event.target.classList.contains("popup")) {
-    closeModal(elem, className);
+    closeModal(event.target);
   }
 }
 
-function closeOnEsc(event, elem, className) {
-  if (elem.classList.contains("popup_is-opened") && event.key === "Escape") {
-    closeModal(elem, className);
+function closeOnEsc(event) {
+  const elem = document.querySelector(".popup_is-opened");
+  if (elem && event.key === "Escape") {
+    closeModal(elem);
   }
 }
 
-export { openModal, closeModal, closeOnOverlay, closeOnEsc };
+export { openModal, closeModal };

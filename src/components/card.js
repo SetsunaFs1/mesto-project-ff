@@ -9,7 +9,7 @@ function createCard(card, deleteCard, likeCard, openCardPopup) {
   cardElem.querySelector(".card__title").textContent = card.name;
   cardImg.alt = card.name;
   cardImg.src = card.link;
-  document.querySelector(".popup_type_image").classList.add("popup_is-animated");
+
   cardElem.addEventListener("click", () => openCardPopup(card));
   deleteButton.addEventListener("click", deleteCard);
   likeButton.addEventListener("click", (event) => likeCard(event, likeButton));

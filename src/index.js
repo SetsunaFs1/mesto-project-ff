@@ -1,21 +1,25 @@
 import "./pages/index.css";
 import { initialCards } from "./components/cards";
 import { createCard, deleteCard, likeCard } from "./components/card";
-import { openModal, closeModal, closeOnOverlay, closeOnEsc } from "./components/modal";
+import { openModal, closeModal } from "./components/modal";
 
 const cardList = document.querySelector(".places__list");
 const img = document.querySelector(".popup__image");
 const imgPopupText = document.querySelector(".popup__caption");
-
 const popupImg = document.querySelector(".popup_type_image");
 const popupCard = document.querySelector(".popup_type_new-card");
 const popupProfile = document.querySelector(".popup_type_edit");
-
 const btnImgClose = popupImg.querySelector(".popup__close");
-const nameProfile = document.querySelector('.profile__title');
-const jobProfile = document.querySelector('.profile__description');
+const nameProfile = document.querySelector(".profile__title");
+const jobProfile = document.querySelector(".profile__description");
 
-btnImgClose.addEventListener("click", closeCardPopup);
+btnImgClose.addEventListener("click", () => {
+  closeModal(popupImg);
+});
+
+popupImg.classList.add("popup_is-animated");
+popupCard.classList.add("popup_is-animated");
+popupProfile.classList.add("popup_is-animated");
 
 //добавление карточек из массива
 initialCards.forEach(function (card) {
@@ -31,29 +35,25 @@ function createEditPopupListeners() {
   const formEditProfile = document.forms["edit-profile"];
   const nameInput = formEditProfile.elements.name;
   const jobInput = formEditProfile.elements.description;
-  popupProfile.classList.add("popup_is-animated");
+
+  btnEditClose.addEventListener("click", () => {
+    closeModal(popupProfile);
+  });
 
   function openEditPopup() {
-    openModal(popupProfile, "popup_is-opened");
-
-    btnEditClose.addEventListener("click", closeEditPopup);
-
+    openModal(popupProfile);
     nameInput.value = nameProfile.textContent;
     jobInput.value = jobProfile.textContent;
-  }
-  function closeEditPopup() {
-    btnEditClose.removeEventListener("click", closeEditPopup);
-    closeModal(popupProfile, "popup_is-opened");
   }
 
   function submitEditProfileForm(event) {
     event.preventDefault();
     nameProfile.textContent = nameInput.value;
     jobProfile.textContent = jobInput.value;
-    closeModal(popupProfile, "popup_is-opened");
+    closeModal(popupProfile);
   }
   btnEditOpen.addEventListener("click", openEditPopup);
-  formEditProfile.addEventListener('submit', submitEditProfileForm);
+  formEditProfile.addEventListener("submit", submitEditProfileForm);
 }
 
 //открытие и закрытие окна добавления карточек
@@ -64,20 +64,13 @@ function createCardPopupListeners() {
   const formCreateCard = document.forms["new-place"];
   const nameInput = formCreateCard.elements["place-name"];
   const linkInput = formCreateCard.elements.link;
-  popupCard.classList.add("popup_is-animated");
-  
+
+  btnCardClose.addEventListener("click", () => {
+    closeModal(popupCard);
+  });
 
   function openCreateCardPopup() {
-    openModal(popupCard, "popup_is-opened");
-    btnCardClose.addEventListener("click", closeCardPopup);
-    
-    
-  }
-  function closeCardPopup() {
-    btnCardClose.removeEventListener("click", closeCardPopup);
-    popupCard.removeEventListener("click", closeOnOverlay);
-    window.removeEventListener("keydown", closeOnEsc);
-    closeModal(popupCard, "popup_is-opened");
+    openModal(popupCard);
   }
 
   function submitAddCardForm(event) {
@@ -85,29 +78,24 @@ function createCardPopupListeners() {
 
     const newCard = {
       name: nameInput.value,
-      link: linkInput.value
-    }
+      link: linkInput.value,
+    };
 
     const cardElem = createCard(newCard, deleteCard, likeCard, openCardPopup);
     cardList.prepend(cardElem);
     formCreateCard.reset();
-    closeModal(popupCard, "popup_is-opened");
+    closeModal(popupCard);
   }
   btnCardAdd.addEventListener("click", openCreateCardPopup);
-  formCreateCard.addEventListener('submit', submitAddCardForm);
+  formCreateCard.addEventListener("submit", submitAddCardForm);
 }
 
 function openCardPopup(card) {
-  openModalImg(popupImg, "popup_is-opened", card.link, card.name, card.name);
-}
-function closeCardPopup() {
-  btnImgClose.removeEventListener("click", closeCardPopup);
-  closeModal(popupImg, "popup_is-opened");
+  openModalImg(popupImg, card.link, card.name, card.name);
 }
 
-function openModalImg(elem, className, imgLink, imgName, textName) {
-  openModal(elem, className);
-  
+function openModalImg(elem, imgLink, imgName, textName) {
+  openModal(elem);
   img.src = imgLink;
   img.alt = imgName;
   imgPopupText.textContent = textName;
