@@ -18,6 +18,10 @@
   background: rgba(0, 0, 0, 0.8);
   cursor: pointer;
 }
+.popup__button:disabled:hover {
+  cursor: default;
+  background: transparent;
+}
 
 @media screen and (max-width: 568px) {
   .popup__button {

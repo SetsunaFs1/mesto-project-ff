@@ -17,8 +17,14 @@ module.exports = {
   devServer: {
     static: path.resolve(__dirname, './dist'),
     compress: true,
+    hot: true,
     port: 8080,
     open: true
+  },
+  performance: {
+    hints: false,
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000
   },
   module: {
     rules: [
