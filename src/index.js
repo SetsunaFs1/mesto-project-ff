@@ -2,7 +2,7 @@
 import "./pages/index.css";
 // import { initialCards } from "./components/cards";
 import { createCard, deleteCard, likeCard } from "./components/card";
-import { openModal, closeModal, openModalDelete } from "./components/modal";
+import { openModal, closeModal } from "./components/modal";
 import { enableValidation, clearValidation } from "./components/validation";
 import {
   getUserData,
@@ -24,6 +24,9 @@ const validationConfig = {
 
 const cardList = document.querySelector(".places__list");
 const img = document.querySelector(".popup__image");
+const popupDelete = document.querySelector(".popup_type_delete");
+const btnDeleteInPopup = popupDelete.querySelector(".popup__button");
+const closePopupDelete = popupDelete.querySelector(".popup__close");
 const imgPopupText = document.querySelector(".popup__caption");
 const popupImg = document.querySelector(".popup_type_image");
 const btnImgClose = popupImg.querySelector(".popup__close");
@@ -31,25 +34,37 @@ const nameProfile = document.querySelector(".profile__title");
 const jobProfile = document.querySelector(".profile__description");
 const avatar = document.querySelector(".avatar");
 let userData = null;
+let cardToDelete = null;
+let cardIdToDelete = null;
+
+const deleteCallback = (card, cardId) => {
+  cardToDelete = card;
+  cardIdToDelete = cardId;
+  openModal(popupDelete);
+  closePopupDelete.addEventListener("click", (event) =>
+    closeModal(event, popupDelete)
+  );
+  btnDeleteInPopup.addEventListener("click", (event) => {
+    deleteCard(event, cardToDelete, cardIdToDelete);
+    closeModal(event, popupDelete);
+  });
+};
 
 btnImgClose.addEventListener("click", (event) => {
   closeModal(event, popupImg);
 });
 
 Promise.all([getUserData(), getInitialCards()])
-  .then((data) => {
-    const userDataValue = data[0];
+  .then(([userDataValue, cards]) => {
     userData = { ...userDataValue };
     nameProfile.textContent = userDataValue.name;
     jobProfile.textContent = userDataValue.about;
     avatar.src = userDataValue.avatar;
-    const cards = data[1];
     cards.forEach((card) => {
       const cardElem = createCard(
         card,
         userDataValue,
-        openModalDelete,
-        deleteCard,
+        deleteCallback,
         likeCard,
         openCardPopup
       );
@@ -78,7 +93,7 @@ function createEditPopupListeners() {
     openModal(popupProfile);
     nameInput.value = nameProfile.textContent;
     jobInput.value = jobProfile.textContent;
-    clearValidation(formEditProfile, validationConfig);
+    clearValidation(formEditProfile, submitButton, validationConfig);
   }
 
   function submitEditProfileForm(event) {
@@ -90,12 +105,10 @@ function createEditPopupListeners() {
       .then((data) => {
         nameProfile.textContent = data.name;
         jobProfile.textContent = data.about;
-        submitButton.textContent = "Сохранить";
         closeModal(event, popupProfile);
       })
-      .catch(() => {
-        submitButton.textContent = "Сохранить";
-      });
+      .catch(() => console.log(err))
+      .finally(() => (submitButton.textContent = "Сохранить"));
   }
   btnEditOpen.addEventListener("click", openEditPopup);
   formEditProfile.addEventListener("submit", submitEditProfileForm);
@@ -116,7 +129,7 @@ function createCardPopupListeners() {
   });
 
   function openCreateCardPopup() {
-    clearValidation(formCreateCard, validationConfig);
+    clearValidation(formCreateCard, submitButton, validationConfig);
     openModal(popupCard);
     nameInput.value = "";
     linkInput.value = "";
@@ -137,8 +150,7 @@ function createCardPopupListeners() {
         const cardElem = createCard(
           data,
           userData,
-          openModalDelete,
-          deleteCard,
+          deleteCallback,
           likeCard,
           openCardPopup
         );
@@ -147,9 +159,10 @@ function createCardPopupListeners() {
         submitButton.textContent = "Сохранить";
         closeModal(event, popupCard);
       })
-      .catch(() => {
-        submitButton.textContent = "Сохранить";
-      });
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => (submitButton.textContent = "Сохранить"));
   }
   btnCardAdd.addEventListener("click", openCreateCardPopup);
   formCreateCard.addEventListener("submit", submitAddCardForm);
@@ -184,7 +197,7 @@ function createAvatarPopupListeners() {
   });
 
   function openUpdateAvatarPopup() {
-    clearValidation(formUpdateAvatar, validationConfig);
+    clearValidation(formUpdateAvatar, submitButton, validationConfig);
     openModal(popupUpdateAvatar);
     linkInput.value = "";
   }
@@ -196,12 +209,14 @@ function createAvatarPopupListeners() {
 
     checkAvatarSource(linkInput.value)
       .then(() => {
-        updateAvatar(linkInput.value).then((data) => {
-          formUpdateAvatar.reset();
-          avatar.src = data.avatar;
-          submitButton.textContent = "Сохранить";
-          closeModal(event, popupUpdateAvatar);
-        });
+        updateAvatar(linkInput.value)
+          .then((data) => {
+            formUpdateAvatar.reset();
+            avatar.src = data.avatar;
+            submitButton.textContent = "Сохранить";
+            closeModal(event, popupUpdateAvatar);
+          })
+          .catch((err) => console.log(err));
       })
       .catch((err) => {
         submitButton.textContent = "Сохранить";

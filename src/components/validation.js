@@ -2,7 +2,12 @@ import { _ } from "core-js";
 
 //вызов функций enableValidation и clearValidation должен находиться в файле index.js. А все другие функции, включая декларирование функции enableValidation и валидации форм, — в отдельном файле validation.js.
 
-const showInputError = (formElement, inputElement, errorMessage, validationConfig) => {
+const showInputError = (
+  formElement,
+  inputElement,
+  errorMessage,
+  validationConfig
+) => {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
 
   inputElement.classList.add(validationConfig.inputErrorClass);
@@ -26,7 +31,12 @@ const isValid = (formElement, inputElement, validationConfig) => {
   }
 
   if (!inputElement.validity.valid) {
-    showInputError(formElement, inputElement, inputElement.validationMessage, validationConfig);
+    showInputError(
+      formElement,
+      inputElement,
+      inputElement.validationMessage,
+      validationConfig
+    );
   } else {
     hideInputError(formElement, inputElement, validationConfig);
   }
@@ -77,7 +87,7 @@ const toggleButtonState = (inputList, buttonElement, validationConfig) => {
   }
 };
 
-const clearValidation = (formElement, validationConfig) => {
+const clearValidation = (formElement, buttonElement, validationConfig) => {
   const formList = Array.from(
     formElement.querySelectorAll(validationConfig.inputSelector)
   );
@@ -85,6 +95,9 @@ const clearValidation = (formElement, validationConfig) => {
   formList.forEach((inputElement) => {
     hideInputError(formElement, inputElement, validationConfig);
   });
+
+  buttonElement.disabled = true;
+  buttonElement.classList.add(validationConfig.inactiveButtonClass);
 };
 
 export { enableValidation, clearValidation };
