@@ -13,5 +13,6 @@
 - Подключила интерфейс к API.
   
 **Результат:** сайт с функциональностью на ванильном JS.
-  
-**https://github.com/SetsunaFs1/mesto-project-ff**
+
+**Ссылка на страницу:**
+**https://setsunafs1.github.io/mesto-project-ff/**
